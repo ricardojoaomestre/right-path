@@ -2,6 +2,7 @@ import { useGame } from './hooks/use-game';
 import { GameBoard } from './components/game-board';
 import { GameHud } from './components/game-hud';
 import { DifficultySelect } from './components/difficulty-select';
+import { SplashScreen } from './components/splash-screen';
 import { StarsBackground } from './components/stars-background';
 import {
   HighScoresTable,
@@ -37,14 +38,12 @@ function App() {
       <StarsBackground />
       <div className="scanlines" aria-hidden="true" />
 
+      {game.phase === 'splash' && (
+        <SplashScreen onPlay={game.showDifficultyMenu} />
+      )}
+
       {game.phase === 'menu' && (
         <main className="screen screen--menu">
-          <div className="logo-block">
-            <div className="logo-glow" aria-hidden="true" />
-            <h1 className="title">Right Path</h1>
-            <p className="tagline">Memorize. Trace. Survive.</p>
-          </div>
-
           <DifficultySelect
             value={game.difficulty}
             onChange={game.setDifficulty}
@@ -80,7 +79,7 @@ function App() {
             isMemorizing={game.isMemorizing}
             canUseToken={game.canUseToken}
             onUseToken={game.useToken}
-            onExit={game.returnToMenu}
+            onExit={game.returnToSplash}
           />
 
           <GameBoard
@@ -132,7 +131,7 @@ function App() {
               <button
                 type="button"
                 className="btn btn--ghost"
-                onClick={game.returnToMenu}
+                onClick={game.returnToSplash}
               >
                 Menu
               </button>
@@ -169,7 +168,7 @@ function App() {
               <button
                 type="button"
                 className="btn btn--ghost"
-                onClick={game.returnToMenu}
+                onClick={game.returnToSplash}
               >
                 Menu
               </button>

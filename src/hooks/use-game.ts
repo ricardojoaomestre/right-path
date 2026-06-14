@@ -29,7 +29,7 @@ interface GameState {
 const WRONG_TILE_FLASH_MS = 2000;
 
 const initialState: GameState = {
-  phase: 'menu',
+  phase: 'splash',
   difficulty: DEFAULT_DIFFICULTY,
   path: [],
   progress: 0,
@@ -310,7 +310,14 @@ export function useGame() {
     ],
   );
 
-  const returnToMenu = useCallback(() => {
+  const showDifficultyMenu = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      phase: 'menu',
+    }));
+  }, []);
+
+  const returnToSplash = useCallback(() => {
     clearTimer();
     setState((prev) => ({
       ...initialState,
@@ -407,7 +414,8 @@ export function useGame() {
     startGame,
     useToken,
     handleTileClick,
-    returnToMenu,
+    showDifficultyMenu,
+    returnToSplash,
     isCellHighlighted,
     isActiveRevealCell,
     isStartCell,
