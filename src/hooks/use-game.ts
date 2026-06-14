@@ -249,6 +249,11 @@ export function useGame() {
       const expected = state.path[state.progress];
       if (!expected) return;
 
+      const alreadyTraced = state.path
+        .slice(0, state.progress)
+        .some((traced) => cellsEqual(traced, cell));
+      if (alreadyTraced) return;
+
       if (cellsEqual(cell, expected)) {
         const tileScore = calculateTileScore(config, state.tokensUsed);
         const newProgress = state.progress + 1;
@@ -325,7 +330,8 @@ export function useGame() {
       if (
         state.phase === 'playing' ||
         state.phase === 'wrongTile' ||
-        state.phase === 'gameover'
+        state.phase === 'gameover' ||
+        state.phase === 'victory'
       ) {
         return state.path
           .slice(0, state.progress)
@@ -395,6 +401,8 @@ export function useGame() {
     config,
     entryLabel,
     exitLabel,
+    entryCell,
+    exitCell,
     setDifficulty,
     startGame,
     useToken,

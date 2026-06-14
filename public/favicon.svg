@@ -1,26 +1,92 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Spaceship path puzzle favicon</title>
+  <desc id="desc">A small spaceship following a glowing path towards a ringed planet in space.</desc>
   <defs>
-    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00f0ff"/>
-      <stop offset="100%" stop-color="#ffe600"/>
+    <radialGradient id="bg" cx="58%" cy="45%" r="75%">
+      <stop offset="0%" stop-color="#24308f"/>
+      <stop offset="45%" stop-color="#10145a"/>
+      <stop offset="100%" stop-color="#050725"/>
+    </radialGradient>
+    <linearGradient id="pathGrad" x1="80" y1="120" x2="410" y2="410" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67e8ff"/>
+      <stop offset="1" stop-color="#1e90ff"/>
     </linearGradient>
-    <filter id="blur">
-      <feGaussianBlur stdDeviation="8"/>
+    <linearGradient id="planetGrad" x1="330" y1="220" x2="450" y2="350" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6ef7ff"/>
+      <stop offset="45%" stop-color="#20c997"/>
+      <stop offset="100%" stop-color="#1172ff"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity="0.45"/>
     </filter>
   </defs>
-  <rect width="512" height="512" fill="#000"/>
-  <g opacity="0.4" filter="url(#blur)">
-    <path d="M96 416 L192 320 L288 352 L416 128" stroke="#ffe600" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="28" y="28" width="456" height="456" rx="92" fill="url(#bg)"/>
+
+  <!-- stars -->
+  <g fill="#fff" opacity=".9">
+    <circle cx="85" cy="94" r="3"/><circle cx="139" cy="67" r="2"/><circle cx="213" cy="92" r="2.5"/>
+    <circle cx="309" cy="67" r="2"/><circle cx="414" cy="105" r="3"/><circle cx="447" cy="178" r="2"/>
+    <circle cx="79" cy="287" r="2.5"/><circle cx="133" cy="402" r="2"/><circle cx="241" cy="438" r="3"/>
+    <circle cx="392" cy="420" r="2.5"/><circle cx="63" cy="176" r="2"/><circle cx="231" cy="172" r="2"/>
+    <circle cx="288" cy="262" r="2"/><circle cx="180" cy="319" r="2.5"/><circle cx="456" cy="303" r="2"/>
   </g>
-  <path d="M96 416 L192 320 L288 352 L416 128" stroke="url(#glow)" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="96" cy="416" r="20" fill="#00f0ff"/>
-  <circle cx="416" cy="128" r="20" fill="#ffe600"/>
-  <g stroke="rgba(255,255,255,0.15)" stroke-width="2">
-    <line x1="64" y1="128" x2="448" y2="128"/>
-    <line x1="64" y1="256" x2="448" y2="256"/>
-    <line x1="64" y1="384" x2="448" y2="384"/>
-    <line x1="128" y1="64" x2="128" y2="448"/>
-    <line x1="256" y1="64" x2="256" y2="448"/>
-    <line x1="384" y1="64" x2="384" y2="448"/>
+  <g fill="#8bdcff" opacity=".55">
+    <circle cx="112" cy="140" r="1.8"/><circle cx="170" cy="223" r="1.8"/><circle cx="259" cy="119" r="1.8"/>
+    <circle cx="355" cy="151" r="1.8"/><circle cx="426" cy="378" r="1.8"/><circle cx="98" cy="354" r="1.8"/>
+  </g>
+
+  <!-- puzzle path -->
+  <path d="M120 140 H252 Q278 140 278 166 V214 H355" fill="none" stroke="#071044" stroke-width="38" stroke-linecap="round" stroke-linejoin="round" opacity=".72"/>
+  <path d="M120 140 H252 Q278 140 278 166 V214 H355" fill="none" stroke="url(#pathGrad)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="M340 310 H242 Q215 310 215 337 V386 H120" fill="none" stroke="#071044" stroke-width="38" stroke-linecap="round" stroke-linejoin="round" opacity=".72"/>
+  <path d="M340 310 H242 Q215 310 215 337 V386 H120" fill="none" stroke="url(#pathGrad)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <g filter="url(#softShadow)">
+    <circle cx="120" cy="140" r="24" fill="#9bf3ff" stroke="#0b72e7" stroke-width="8"/>
+    <circle cx="355" cy="214" r="24" fill="#9bf3ff" stroke="#0b72e7" stroke-width="8"/>
+    <circle cx="340" cy="310" r="24" fill="#9bf3ff" stroke="#0b72e7" stroke-width="8"/>
+    <circle cx="120" cy="386" r="24" fill="#9bf3ff" stroke="#0b72e7" stroke-width="8"/>
+  </g>
+
+  <!-- direction arrow -->
+  <g filter="url(#softShadow)">
+    <path d="M220 255 H292" stroke="#ffc72c" stroke-width="24" stroke-linecap="round"/>
+    <path d="M286 220 L350 255 L286 290 Z" fill="#ffc72c" stroke="#ff9f1c" stroke-width="8" stroke-linejoin="round"/>
+  </g>
+
+  <!-- spaceship -->
+  <g transform="translate(94 255) scale(.92)" filter="url(#softShadow)">
+    <path d="M0 78 L46 -38 C54 -58 82 -58 90 -38 L136 78 L84 60 L68 94 L52 60 Z" fill="#f8fbff" stroke="#0a2b75" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M52 -8 C55 -28 81 -28 84 -8 C87 15 80 31 68 31 C56 31 49 15 52 -8 Z" fill="#1076ff" stroke="#0a2b75" stroke-width="7"/>
+    <path d="M9 61 L0 98 L42 76 Z" fill="#1a9cff" stroke="#0a2b75" stroke-width="6"/>
+    <path d="M127 61 L136 98 L94 76 Z" fill="#1a9cff" stroke="#0a2b75" stroke-width="6"/>
+    <rect x="17" y="32" width="20" height="14" rx="3" fill="#ff8a00"/>
+    <rect x="99" y="32" width="20" height="14" rx="3" fill="#ff8a00"/>
+    <path d="M42 82 L54 126 L68 92 L82 126 L94 82" fill="#ff8a00" stroke="#ffcf33" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- planet and ring -->
+  <g transform="translate(342 275)" filter="url(#softShadow)">
+    <ellipse cx="52" cy="30" rx="96" ry="25" transform="rotate(-18 52 30)" fill="none" stroke="#ffb020" stroke-width="22"/>
+    <ellipse cx="52" cy="30" rx="96" ry="25" transform="rotate(-18 52 30)" fill="none" stroke="#ffe66d" stroke-width="10"/>
+    <circle cx="52" cy="30" r="58" fill="url(#planetGrad)" stroke="#08266d" stroke-width="7"/>
+    <path d="M3 43 C34 73 91 76 113 31 C97 74 42 90 4 57 Z" fill="#07348f" opacity=".45"/>
+    <ellipse cx="29" cy="10" rx="27" ry="11" transform="rotate(-22 29 10)" fill="#b8ff64" opacity=".85"/>
+    <circle cx="75" cy="-1" r="6" fill="#b7fff8" opacity=".9"/>
+    <circle cx="86" cy="35" r="8" fill="#19e6ff" opacity=".7"/>
+    <circle cx="48" cy="54" r="7" fill="#19e6ff" opacity=".65"/>
+  </g>
+
+  <!-- sparkle -->
+  <g fill="#ffe95c" stroke="#ffb000" stroke-width="5" stroke-linejoin="round" filter="url(#glow)">
+    <path d="M416 89 L427 118 L456 129 L427 140 L416 169 L405 140 L376 129 L405 118 Z"/>
+    <path d="M435 365 L443 384 L462 392 L443 400 L435 419 L427 400 L408 392 L427 384 Z"/>
   </g>
 </svg>

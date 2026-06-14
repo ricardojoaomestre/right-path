@@ -2,19 +2,24 @@ import { useGame } from './hooks/use-game';
 import { GameBoard } from './components/game-board';
 import { GameHud } from './components/game-hud';
 import { DifficultySelect } from './components/difficulty-select';
+import { StarsBackground } from './components/stars-background';
 import {
   HighScoresTable,
   HighScoresTitle,
 } from './components/high-scores-table';
+import { getRouteAssets } from './game/route-assets';
 
 function App() {
   const game = useGame();
+  const routeAssets = getRouteAssets(game.difficulty);
 
   const showBoard =
     game.phase === 'revealing' ||
     game.phase === 'playing' ||
     game.phase === 'tokenRevealing' ||
-    game.phase === 'wrongTile';
+    game.phase === 'wrongTile' ||
+    game.phase === 'gameover' ||
+    game.phase === 'victory';
 
   const boardDisabled =
     game.phase !== 'playing' || game.isMemorizing;
@@ -23,10 +28,13 @@ function App() {
     game.phase === 'revealing' ||
     game.phase === 'tokenRevealing' ||
     game.phase === 'wrongTile' ||
+    game.phase === 'gameover' ||
+    game.phase === 'victory' ||
     game.isMemorizing;
 
   return (
     <div className="app">
+      <StarsBackground />
       <div className="scanlines" aria-hidden="true" />
 
       {game.phase === 'menu' && (
@@ -66,6 +74,8 @@ function App() {
             tokensRemaining={game.tokensRemaining}
             tokensUsed={game.tokensUsed}
             phase={game.phase}
+            startIcon={routeAssets.start}
+            endIcon={routeAssets.end}
             entryLabel={game.entryLabel}
             exitLabel={game.exitLabel}
             revealProgress={game.revealProgress}
@@ -77,11 +87,15 @@ function App() {
 
           <GameBoard
             size={game.config.size}
+            routeAssets={routeAssets}
+            startCell={game.entryCell}
+            endCell={game.exitCell}
             pathVisible={
               game.showPath ||
               game.phase === 'playing' ||
               game.phase === 'wrongTile' ||
-              game.phase === 'gameover'
+              game.phase === 'gameover' ||
+              game.phase === 'victory'
             }
             locked={boardLocked}
             disabled={boardDisabled}
@@ -96,7 +110,7 @@ function App() {
       )}
 
       {game.phase === 'gameover' && (
-        <div className="overlay">
+        <div className="overlay overlay--result">
           <div className="modal">
             <h2 className="modal__title modal__title--fail">Game Over</h2>
             <p className="modal__score">
@@ -130,7 +144,7 @@ function App() {
       )}
 
       {game.phase === 'victory' && (
-        <div className="overlay">
+        <div className="overlay overlay--result">
           <div className="modal modal--victory">
             <h2 className="modal__title modal__title--win">Path Complete</h2>
             <p className="modal__score modal__score--big">

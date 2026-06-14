@@ -8,6 +8,8 @@ interface GameHudProps {
   tokensRemaining: number | 'infinite';
   tokensUsed: number;
   phase: GamePhase;
+  startIcon: string;
+  endIcon: string;
   entryLabel: string;
   exitLabel: string;
   revealProgress: number;
@@ -25,6 +27,8 @@ export function GameHud({
   tokensRemaining,
   tokensUsed,
   phase,
+  startIcon,
+  endIcon,
   entryLabel,
   exitLabel,
   revealProgress,
@@ -60,6 +64,11 @@ export function GameHud({
     <header className="hud">
       <div className="hud__route">
         <span className="hud__route-point hud__route-point--entry">
+          <img
+            className="hud__route-icon hud__route-icon--start"
+            src={startIcon}
+            alt=""
+          />
           <span className="hud__route-tag">Entry</span>
           <strong>{entryLabel || '—'}</strong>
         </span>
@@ -67,6 +76,11 @@ export function GameHud({
           →
         </span>
         <span className="hud__route-point hud__route-point--exit">
+          <img
+            className="hud__route-icon hud__route-icon--end"
+            src={endIcon}
+            alt=""
+          />
           <span className="hud__route-tag">Exit</span>
           <strong>{exitLabel || '—'}</strong>
         </span>

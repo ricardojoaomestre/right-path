@@ -31,9 +31,6 @@ export const Tile = memo(function Tile({
   if (isEnd) classes.push('tile--end');
 
   const label = formatCellLabel(cell);
-  let marker: string | null = null;
-  if (isStart) marker = 'IN';
-  else if (isEnd) marker = 'OUT';
 
   return (
     <button
@@ -51,7 +48,6 @@ export const Tile = memo(function Tile({
     >
       {(isStart || isEnd) && (
         <span className="tile__marker" aria-hidden="true">
-          <span className="tile__marker-tag">{marker}</span>
           <span className="tile__marker-coord">{label}</span>
         </span>
       )}

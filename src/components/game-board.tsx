@@ -1,10 +1,14 @@
 import { useMemo } from 'react';
 import { colToLabel } from '../game/cell-labels';
 import type { Cell } from '../game/types';
+import type { RouteAssets } from '../game/route-assets';
 import { Tile } from './tile';
 
 interface GameBoardProps {
   size: number;
+  routeAssets: RouteAssets;
+  startCell: Cell | null;
+  endCell: Cell | null;
   pathVisible: boolean;
   locked: boolean;
   disabled: boolean;
@@ -18,6 +22,9 @@ interface GameBoardProps {
 
 export function GameBoard({
   size,
+  routeAssets,
+  startCell,
+  endCell,
   pathVisible,
   locked,
   disabled,
@@ -49,6 +56,9 @@ export function GameBoard({
   );
 
   const boardClass = pathVisible ? 'board board--path-visible' : 'board';
+  const markersClass = pathVisible
+    ? 'board-with-markers board-with-markers--path-visible'
+    : 'board-with-markers';
 
   return (
     <div className={`board-scroll${locked ? ' board-scroll--locked' : ''}`}>
@@ -78,21 +88,44 @@ export function GameBoard({
           ))}
         </div>
         <div
-          className={boardClass}
+          className={markersClass}
+          style={{
+            ['--start-col' as string]: startCell?.col ?? 0,
+            ['--end-col' as string]: endCell?.col ?? 0,
+          }}
         >
-          {tiles.map((cell) => (
-            <Tile
-              key={`${cell.row}-${cell.col}`}
-              cell={cell}
-              highlighted={isCellHighlighted(cell)}
-              activeReveal={isActiveRevealCell(cell)}
-              isStart={isStartCell(cell)}
-              isEnd={isEndCell(cell)}
-              isWrong={isWrongTile(cell)}
-              disabled={disabled}
-              onClick={onTileClick}
+          {startCell && (
+            <img
+              className="route-marker route-marker--start"
+              src={routeAssets.start}
+              alt="Entry spaceship"
             />
-          ))}
+          )}
+          <div className={boardClass}>
+            {tiles.map((cell) => {
+              const highlighted = isCellHighlighted(cell);
+              return (
+                <Tile
+                  key={`${cell.row}-${cell.col}`}
+                  cell={cell}
+                  highlighted={highlighted}
+                  activeReveal={isActiveRevealCell(cell)}
+                  isStart={isStartCell(cell)}
+                  isEnd={isEndCell(cell)}
+                  isWrong={isWrongTile(cell)}
+                  disabled={disabled || highlighted}
+                  onClick={onTileClick}
+                />
+              );
+            })}
+          </div>
+          {endCell && (
+            <img
+              className="route-marker route-marker--end"
+              src={routeAssets.end}
+              alt="Exit planet"
+            />
+          )}
         </div>
       </div>
     </div>
