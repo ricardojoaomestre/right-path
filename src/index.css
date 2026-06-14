@@ -452,23 +452,6 @@ body {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 10px 16px;
-  border: 1px solid rgba(255, 230, 0, 0.35);
-  border-radius: 6px;
-  background: rgba(255, 230, 0, 0.08);
-  opacity: 0;
-  visibility: hidden;
-  max-height: 0;
-  overflow: hidden;
-  pointer-events: none;
-  transition: opacity 0.2s, max-height 0.2s;
-}
-
-.hud__countdown--visible {
-  opacity: 1;
-  visibility: visible;
-  max-height: 120px;
-  pointer-events: auto;
 }
 
 .hud__countdown-value {
@@ -499,7 +482,6 @@ body {
   justify-content: center;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid var(--grid-line);
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.35);
 }
@@ -570,11 +552,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: clamp(20px, 5vw, 32px) 8px;
-  border: 1px solid var(--grid-line-strong);
   border-radius: 4px;
-  box-shadow:
-    0 0 20px rgba(0, 240, 255, 0.05),
-    inset 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
 .board-scroll--locked {
@@ -801,10 +779,6 @@ body {
 .tile--end {
   outline: 1px solid rgba(255, 230, 0, 0.55);
   outline-offset: -1px;
-}
-
-.tile--end:not(.tile--highlighted) {
-  background: rgba(0, 240, 255, 0.08);
 }
 
 .tile--wrong {

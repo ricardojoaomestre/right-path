@@ -63,27 +63,40 @@ export function GameHud({
   return (
     <header className="hud">
       <div className="hud__route">
-        <span className="hud__route-point hud__route-point--entry">
-          <img
-            className="hud__route-icon hud__route-icon--start"
-            src={startIcon}
-            alt=""
-          />
-          <span className="hud__route-tag">Entry</span>
-          <strong>{entryLabel || '—'}</strong>
-        </span>
-        <span className="hud__route-arrow" aria-hidden="true">
-          →
-        </span>
-        <span className="hud__route-point hud__route-point--exit">
-          <img
-            className="hud__route-icon hud__route-icon--end"
-            src={endIcon}
-            alt=""
-          />
-          <span className="hud__route-tag">Exit</span>
-          <strong>{exitLabel || '—'}</strong>
-        </span>
+        {isMemorizing ? (
+          <div className="hud__countdown" aria-live="polite">
+            <span className="hud__countdown-value">
+              {memorizeSecondsLeft ?? 0}
+            </span>
+            <span className="hud__countdown-label">
+              {memorizeSecondsLeft === 1 ? 'second left' : 'seconds left'}
+            </span>
+          </div>
+        ) : (
+          <>
+            <span className="hud__route-point hud__route-point--entry">
+              <img
+                className="hud__route-icon hud__route-icon--start"
+                src={startIcon}
+                alt=""
+              />
+              <span className="hud__route-tag">Entry</span>
+              <strong>{entryLabel || '—'}</strong>
+            </span>
+            <span className="hud__route-arrow" aria-hidden="true">
+              →
+            </span>
+            <span className="hud__route-point hud__route-point--exit">
+              <img
+                className="hud__route-icon hud__route-icon--end"
+                src={endIcon}
+                alt=""
+              />
+              <span className="hud__route-tag">Exit</span>
+              <strong>{exitLabel || '—'}</strong>
+            </span>
+          </>
+        )}
       </div>
 
       <div className="hud__toolbar">
@@ -118,24 +131,9 @@ export function GameHud({
         </div>
       </div>
 
-      {showStatusArea && (phaseLabel || isMemorizing) && (
+      {showStatusArea && phaseLabel && (
         <div className="hud__status">
-          {phaseLabel && (
-            <p className={`hud__phase hud__phase--${phase}`}>{phaseLabel}</p>
-          )}
-
-          <div
-            className={`hud__countdown${isMemorizing ? ' hud__countdown--visible' : ''}`}
-            aria-hidden={!isMemorizing}
-            aria-live="polite"
-          >
-            <span className="hud__countdown-value">
-              {memorizeSecondsLeft ?? 0}
-            </span>
-            <span className="hud__countdown-label">
-              {memorizeSecondsLeft === 1 ? 'second left' : 'seconds left'}
-            </span>
-          </div>
+          <p className={`hud__phase hud__phase--${phase}`}>{phaseLabel}</p>
         </div>
       )}
     </header>
