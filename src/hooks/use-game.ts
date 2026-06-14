@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatCellLabel } from '../game/cell-labels';
+import { getBoardDimensions } from '../game/board-dimensions';
 import { DIFFICULTY_CONFIG, DEFAULT_DIFFICULTY } from '../game/config';
 import { cellsEqual, generatePath } from '../game/path-generator';
 import { calculateTileScore } from '../game/scoring';
@@ -24,6 +25,8 @@ interface GameState {
   highScores: HighScoreEntry[];
   showPath: boolean;
   wrongTile: Cell | null;
+  boardCols: number;
+  boardRows: number;
 }
 
 const WRONG_TILE_FLASH_MS = 2000;
@@ -41,6 +44,8 @@ const initialState: GameState = {
   highScores: [],
   showPath: false,
   wrongTile: null,
+  boardCols: DIFFICULTY_CONFIG[DEFAULT_DIFFICULTY].cols,
+  boardRows: DIFFICULTY_CONFIG[DEFAULT_DIFFICULTY].rows,
 };
 
 export function useGame() {
@@ -157,7 +162,8 @@ export function useGame() {
 
   const startGame = useCallback(() => {
     clearTimer();
-    const path = generatePath(config.size, config.minTurns, config.maxTurns);
+    const { cols, rows } = getBoardDimensions(state.difficulty);
+    const path = generatePath(cols, rows, config.minTurns, config.maxTurns);
 
     setState((prev) => ({
       ...prev,
@@ -172,6 +178,8 @@ export function useGame() {
       showPath: false,
       highScores: [],
       wrongTile: null,
+      boardCols: cols,
+      boardRows: rows,
     }));
 
     beginPathReveal(
@@ -188,7 +196,7 @@ export function useGame() {
         }));
       },
     );
-  }, [clearTimer, config, beginPathReveal]);
+  }, [clearTimer, config, beginPathReveal, state.difficulty]);
 
   const finishTokenReveal = useCallback(() => {
     clearTimer();
@@ -200,6 +208,40 @@ export function useGame() {
       memorizeSecondsLeft: null,
       showPath: false,
     }));
+  }, [clearTimer]);
+
+  const skipMemorize = useCallback(() => {
+    clearTimer();
+    setState((prev) => {
+      const memorizing =
+        prev.showPath &&
+        prev.path.length > 0 &&
+        prev.revealProgress >= prev.path.length &&
+        prev.memorizeSecondsLeft !== null;
+
+      if (!memorizing) {
+        return prev;
+      }
+
+      if (prev.phase === 'tokenRevealing') {
+        return {
+          ...prev,
+          phase: 'playing',
+          progress: 0,
+          revealProgress: 0,
+          memorizeSecondsLeft: null,
+          showPath: false,
+        };
+      }
+
+      return {
+        ...prev,
+        phase: 'playing',
+        revealProgress: 0,
+        memorizeSecondsLeft: null,
+        showPath: false,
+      };
+    });
   }, [clearTimer]);
 
   const useToken = useCallback(() => {
@@ -413,6 +455,7 @@ export function useGame() {
     setDifficulty,
     startGame,
     useToken,
+    skipMemorize,
     handleTileClick,
     showDifficultyMenu,
     returnToSplash,

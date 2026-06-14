@@ -14,6 +14,7 @@ interface GameHudProps {
   isMemorizing: boolean;
   canUseToken: boolean;
   onUseToken: () => void;
+  onSkipMemorize: () => void;
   onExit: () => void;
 }
 
@@ -31,21 +32,26 @@ export function GameHud({
   isMemorizing,
   canUseToken,
   onUseToken,
+  onSkipMemorize,
   onExit,
 }: GameHudProps) {
   const tokensLabel =
     tokensRemaining === 'infinite' ? '∞' : String(tokensRemaining);
 
+  const hasTokens =
+    tokensRemaining === 'infinite' ||
+    (typeof tokensRemaining === 'number' && tokensRemaining > 0);
+
   const showTokenButton =
-    phase === 'playing' &&
-    !isMemorizing &&
-    (tokensRemaining === 'infinite' ||
-      (typeof tokensRemaining === 'number' && tokensRemaining > 0));
+    (phase === 'playing' || phase === 'tokenRevealing') && hasTokens;
 
   const showExitButton =
     phase === 'revealing' ||
     phase === 'playing' ||
-    phase === 'tokenRevealing';
+    phase === 'tokenRevealing' ||
+    phase === 'wrongTile' ||
+    phase === 'gameover' ||
+    phase === 'victory';
 
   const showStatusArea =
     phase === 'revealing' ||
@@ -63,39 +69,47 @@ export function GameHud({
   return (
     <header className="hud">
       <div className="hud__route">
-        {isMemorizing ? (
-          <div className="hud__countdown" aria-live="polite">
+        <div
+          className={`hud__route-content${isMemorizing ? ' hud__route-content--hidden' : ''}`}
+        >
+          <span className="hud__route-point hud__route-point--entry">
+            <img
+              className="hud__route-icon hud__route-icon--start"
+              src={startIcon}
+              alt=""
+            />
+            <span className="hud__route-tag">Entry</span>
+            <strong>{entryLabel || '—'}</strong>
+          </span>
+          <span className="hud__route-arrow" aria-hidden="true">
+            →
+          </span>
+          <span className="hud__route-point hud__route-point--exit">
+            <img
+              className="hud__route-icon hud__route-icon--end"
+              src={endIcon}
+              alt=""
+            />
+            <span className="hud__route-tag">Exit</span>
+            <strong>{exitLabel || '—'}</strong>
+          </span>
+        </div>
+
+        {isMemorizing && (
+          <button
+            type="button"
+            className="hud__countdown"
+            aria-live="polite"
+            aria-label="Skip memorize countdown and hide path"
+            onClick={onSkipMemorize}
+          >
             <span className="hud__countdown-value">
               {memorizeSecondsLeft ?? 0}
             </span>
             <span className="hud__countdown-label">
               {memorizeSecondsLeft === 1 ? 'second left' : 'seconds left'}
             </span>
-          </div>
-        ) : (
-          <>
-            <span className="hud__route-point hud__route-point--entry">
-              <img
-                className="hud__route-icon hud__route-icon--start"
-                src={startIcon}
-                alt=""
-              />
-              <span className="hud__route-tag">Entry</span>
-              <strong>{entryLabel || '—'}</strong>
-            </span>
-            <span className="hud__route-arrow" aria-hidden="true">
-              →
-            </span>
-            <span className="hud__route-point hud__route-point--exit">
-              <img
-                className="hud__route-icon hud__route-icon--end"
-                src={endIcon}
-                alt=""
-              />
-              <span className="hud__route-tag">Exit</span>
-              <strong>{exitLabel || '—'}</strong>
-            </span>
-          </>
+          </button>
         )}
       </div>
 

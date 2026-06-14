@@ -60,7 +60,8 @@ function splitIntoSegments(total: number, parts: number, minPart: number): numbe
 }
 
 function buildStructuredPath(
-  size: number,
+  cols: number,
+  rows: number,
   startCol: number,
   endCol: number,
   targetTurns: number,
@@ -69,7 +70,7 @@ function buildStructuredPath(
   const verticalSegmentCount = Math.ceil(segmentCount / 2);
   const horizontalSegmentCount = Math.floor(segmentCount / 2);
 
-  const verticalLengths = splitIntoSegments(size - 1, verticalSegmentCount, 1);
+  const verticalLengths = splitIntoSegments(rows - 1, verticalSegmentCount, 1);
   if (!verticalLengths) {
     return null;
   }
@@ -79,7 +80,7 @@ function buildStructuredPath(
 
   for (let i = 0; i < horizontalSegmentCount; i += 1) {
     const isLast = i === horizontalSegmentCount - 1;
-    const maxStep = Math.min(3, size - 1);
+    const maxStep = Math.min(3, cols - 1);
 
     if (isLast) {
       const needed = endCol - (startCol + colOffset);
@@ -109,7 +110,7 @@ function buildStructuredPath(
   let projectedCol = startCol;
   for (const step of horizontalLengths) {
     projectedCol += step;
-    if (projectedCol < 0 || projectedCol >= size) {
+    if (projectedCol < 0 || projectedCol >= cols) {
       return null;
     }
   }
@@ -130,7 +131,7 @@ function buildStructuredPath(
 
       for (let step = 0; step < length; step += 1) {
         row += 1;
-        if (row >= size) {
+        if (row >= rows) {
           return null;
         }
 
@@ -150,7 +151,7 @@ function buildStructuredPath(
 
       for (let step = 0; step < Math.abs(length); step += 1) {
         col += dir;
-        if (col < 0 || col >= size) {
+        if (col < 0 || col >= cols) {
           return null;
         }
 
@@ -166,19 +167,24 @@ function buildStructuredPath(
     }
   }
 
-  if (row !== size - 1 || col !== endCol) {
+  if (row !== rows - 1 || col !== endCol) {
     return null;
   }
 
   return path;
 }
 
-function buildSimplePath(size: number, startCol: number, endCol: number): Cell[] {
+function buildSimplePath(
+  _cols: number,
+  rows: number,
+  startCol: number,
+  endCol: number,
+): Cell[] {
   const path: Cell[] = [{ row: 0, col: startCol }];
   let row = 0;
   let col = startCol;
 
-  while (row < size - 1) {
+  while (row < rows - 1) {
     row += 1;
     path.push({ row, col });
   }
@@ -191,27 +197,36 @@ function buildSimplePath(size: number, startCol: number, endCol: number): Cell[]
   return path;
 }
 
-function buildFallbackPath(size: number, minTurns: number): Cell[] {
+function buildFallbackPath(cols: number, rows: number, minTurns: number): Cell[] {
   for (let attempt = 0; attempt < 40; attempt += 1) {
-    const startCol = Math.floor(Math.random() * size);
-    const endCol = Math.floor(Math.random() * size);
+    const startCol = Math.floor(Math.random() * cols);
+    const endCol = Math.floor(Math.random() * cols);
     const targetTurns = minTurns + Math.floor(Math.random() * 2);
-    const path = buildStructuredPath(size, startCol, endCol, targetTurns);
+    const path = buildStructuredPath(cols, rows, startCol, endCol, targetTurns);
 
     if (path && countTurns(path) >= minTurns) {
       return path;
     }
   }
 
-  const startCol = Math.floor(Math.random() * size);
-  const endCol = Math.max(0, Math.min(size - 1, startCol + (Math.random() < 0.5 ? -1 : 1)));
-  const path = buildStructuredPath(size, startCol, endCol, Math.max(minTurns, 1));
+  const startCol = Math.floor(Math.random() * cols);
+  const endCol = Math.max(
+    0,
+    Math.min(cols - 1, startCol + (Math.random() < 0.5 ? -1 : 1)),
+  );
+  const path = buildStructuredPath(
+    cols,
+    rows,
+    startCol,
+    endCol,
+    Math.max(minTurns, 1),
+  );
 
   if (path) {
     return path;
   }
 
-  return buildSimplePath(size, startCol, endCol);
+  return buildSimplePath(cols, rows, startCol, endCol);
 }
 
 function turnCountDistance(
@@ -231,7 +246,8 @@ function turnCountDistance(
 }
 
 export function generatePath(
-  size: number,
+  cols: number,
+  rows: number,
   minTurns: number,
   maxTurns: number,
 ): Cell[] {
@@ -242,9 +258,9 @@ export function generatePath(
   let bestTurnDistance = Number.POSITIVE_INFINITY;
 
   for (let attempt = 0; attempt < 80; attempt += 1) {
-    const startCol = Math.floor(Math.random() * size);
-    const endCol = Math.floor(Math.random() * size);
-    const path = buildStructuredPath(size, startCol, endCol, targetTurns);
+    const startCol = Math.floor(Math.random() * cols);
+    const endCol = Math.floor(Math.random() * cols);
+    const path = buildStructuredPath(cols, rows, startCol, endCol, targetTurns);
 
     if (!path) {
       continue;
@@ -267,7 +283,7 @@ export function generatePath(
     return bestPath;
   }
 
-  return buildFallbackPath(size, minTurns);
+  return buildFallbackPath(cols, rows, minTurns);
 }
 
 export { cellsEqual, countTurns };

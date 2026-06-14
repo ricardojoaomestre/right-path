@@ -1,4 +1,11 @@
+import { useSyncExternalStore } from 'react';
 import type { Difficulty } from '../game/types';
+import {
+  formatBoardDimensions,
+  getBoardDimensions,
+  isMobileBoardViewport,
+  subscribeMobileBoardViewport,
+} from '../game/board-dimensions';
 import { DIFFICULTY_CONFIG, DIFFICULTY_ORDER } from '../game/config';
 
 interface DifficultySelectProps {
@@ -7,6 +14,12 @@ interface DifficultySelectProps {
 }
 
 export function DifficultySelect({ value, onChange }: DifficultySelectProps) {
+  const isMobileBoard = useSyncExternalStore(
+    subscribeMobileBoardViewport,
+    isMobileBoardViewport,
+    () => false,
+  );
+
   return (
     <div className="difficulty-select">
       <span className="label">Difficulty</span>
@@ -31,7 +44,8 @@ export function DifficultySelect({ value, onChange }: DifficultySelectProps) {
             >
               <span className="difficulty-option__name">{config.label}</span>
               <span className="difficulty-option__meta">
-                {config.size}×{config.size} · {tokensLabel}
+                {formatBoardDimensions(getBoardDimensions(key, isMobileBoard))} ·{' '}
+                {tokensLabel}
               </span>
             </button>
           );

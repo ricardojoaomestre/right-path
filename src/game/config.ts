@@ -3,7 +3,8 @@ import type { Difficulty, DifficultyConfig } from './types';
 export const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
   easy: {
     label: 'Easy',
-    size: 8,
+    cols: 8,
+    rows: 8,
     minTurns: 1,
     maxTurns: 3,
     revealTimeMs: 7000,
@@ -15,7 +16,8 @@ export const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
   },
   medium: {
     label: 'Medium',
-    size: 8,
+    cols: 8,
+    rows: 8,
     minTurns: 3,
     maxTurns: 6,
     revealTimeMs: 3500,
@@ -27,7 +29,8 @@ export const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
   },
   hard: {
     label: 'Hard',
-    size: 10,
+    cols: 10,
+    rows: 10,
     minTurns: 6,
     maxTurns: 12,
     revealTimeMs: 2500,
@@ -39,7 +42,8 @@ export const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
   },
   veryHard: {
     label: 'Very Hard',
-    size: 10,
+    cols: 10,
+    rows: 10,
     minTurns: 10,
     maxTurns: 15,
     revealTimeMs: 1500,

@@ -6,7 +6,8 @@ import { BoardMarkerCell } from './board-marker-cell';
 import { Tile } from './tile';
 
 interface GameBoardProps {
-  size: number;
+  cols: number;
+  rows: number;
   routeAssets: RouteAssets;
   startCell: Cell | null;
   endCell: Cell | null;
@@ -22,7 +23,8 @@ interface GameBoardProps {
 }
 
 export function GameBoard({
-  size,
+  cols,
+  rows,
   routeAssets,
   startCell,
   endCell,
@@ -38,27 +40,27 @@ export function GameBoard({
 }: GameBoardProps) {
   const tiles = useMemo(() => {
     const result: Cell[] = [];
-    for (let row = 0; row < size; row += 1) {
-      for (let col = 0; col < size; col += 1) {
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
         result.push({ row, col });
       }
     }
     return result;
-  }, [size]);
+  }, [cols, rows]);
 
   const colLabels = useMemo(
-    () => Array.from({ length: size }, (_, col) => colToLabel(col)),
-    [size],
+    () => Array.from({ length: cols }, (_, col) => colToLabel(col)),
+    [cols],
   );
 
   const rowLabels = useMemo(
-    () => Array.from({ length: size }, (_, row) => String(row + 1)),
-    [size],
+    () => Array.from({ length: rows }, (_, row) => String(row + 1)),
+    [rows],
   );
 
   const markerColumns = useMemo(
-    () => Array.from({ length: size }, (_, col) => col),
-    [size],
+    () => Array.from({ length: cols }, (_, col) => col),
+    [cols],
   );
 
   const boardClass = pathVisible ? 'board board--path-visible' : 'board';
@@ -70,7 +72,10 @@ export function GameBoard({
     <div className={`board-scroll${locked ? ' board-scroll--locked' : ''}`}>
       <div
         className={frameClass}
-        style={{ ['--grid-size' as string]: size }}
+        style={{
+          ['--grid-cols' as string]: cols,
+          ['--grid-rows' as string]: rows,
+        }}
       >
         <div className="board-gutter" aria-hidden="true" />
         <div className="board-marker-row board-marker-row--top">

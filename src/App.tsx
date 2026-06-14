@@ -79,11 +79,13 @@ function App() {
             isMemorizing={game.isMemorizing}
             canUseToken={game.canUseToken}
             onUseToken={game.useToken}
+            onSkipMemorize={game.skipMemorize}
             onExit={game.returnToSplash}
           />
 
           <GameBoard
-            size={game.config.size}
+            cols={game.boardCols}
+            rows={game.boardRows}
             routeAssets={routeAssets}
             startCell={game.entryCell}
             endCell={game.exitCell}
