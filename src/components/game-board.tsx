@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { colToLabel } from '../game/cell-labels';
 import type { Cell } from '../game/types';
 import type { RouteAssets } from '../game/route-assets';
+import { BoardMarkerCell } from './board-marker-cell';
 import { Tile } from './tile';
 
 interface GameBoardProps {
@@ -55,77 +56,80 @@ export function GameBoard({
     [size],
   );
 
+  const markerColumns = useMemo(
+    () => Array.from({ length: size }, (_, col) => col),
+    [size],
+  );
+
   const boardClass = pathVisible ? 'board board--path-visible' : 'board';
-  const markersClass = pathVisible
-    ? 'board-with-markers board-with-markers--path-visible'
-    : 'board-with-markers';
+  const frameClass = pathVisible
+    ? 'board-frame board-frame--path-visible'
+    : 'board-frame';
 
   return (
     <div className={`board-scroll${locked ? ' board-scroll--locked' : ''}`}>
       <div
-        className={`board-frame${pathVisible ? ' board-frame--path-visible' : ''}`}
+        className={frameClass}
         style={{ ['--grid-size' as string]: size }}
       >
+        <div className="board-gutter" aria-hidden="true" />
+        <div className="board-marker-row board-marker-row--top">
+          {markerColumns.map((col) => (
+            <BoardMarkerCell
+              key={`top-${col}`}
+              variant={startCell?.col === col ? 'ship' : 'spacer'}
+              iconSrc={routeAssets.start}
+              alt="Entry spaceship"
+            />
+          ))}
+        </div>
+
         <div className="board-corner" aria-hidden="true" />
-        <div
-          className="board-col-labels"
-          aria-hidden="true"
-        >
+        <div className="board-col-labels" aria-hidden="true">
           {colLabels.map((label) => (
             <span key={label} className="board-axis-label">
               {label}
             </span>
           ))}
         </div>
-        <div
-          className="board-row-labels"
-          aria-hidden="true"
-        >
+
+        <div className="board-row-labels" aria-hidden="true">
           {rowLabels.map((label) => (
             <span key={label} className="board-axis-label">
               {label}
             </span>
           ))}
         </div>
-        <div
-          className={markersClass}
-          style={{
-            ['--start-col' as string]: startCell?.col ?? 0,
-            ['--end-col' as string]: endCell?.col ?? 0,
-          }}
-        >
-          {startCell && (
-            <img
-              className="route-marker route-marker--start"
-              src={routeAssets.start}
-              alt="Entry spaceship"
-            />
-          )}
-          <div className={boardClass}>
-            {tiles.map((cell) => {
-              const highlighted = isCellHighlighted(cell);
-              return (
-                <Tile
-                  key={`${cell.row}-${cell.col}`}
-                  cell={cell}
-                  highlighted={highlighted}
-                  activeReveal={isActiveRevealCell(cell)}
-                  isStart={isStartCell(cell)}
-                  isEnd={isEndCell(cell)}
-                  isWrong={isWrongTile(cell)}
-                  disabled={disabled || highlighted}
-                  onClick={onTileClick}
-                />
-              );
-            })}
-          </div>
-          {endCell && (
-            <img
-              className="route-marker route-marker--end"
-              src={routeAssets.end}
+
+        <div className={boardClass}>
+          {tiles.map((cell) => {
+            const highlighted = isCellHighlighted(cell);
+            return (
+              <Tile
+                key={`${cell.row}-${cell.col}`}
+                cell={cell}
+                highlighted={highlighted}
+                activeReveal={isActiveRevealCell(cell)}
+                isStart={isStartCell(cell)}
+                isEnd={isEndCell(cell)}
+                isWrong={isWrongTile(cell)}
+                disabled={disabled || highlighted}
+                onClick={onTileClick}
+              />
+            );
+          })}
+        </div>
+
+        <div className="board-gutter" aria-hidden="true" />
+        <div className="board-marker-row board-marker-row--bottom">
+          {markerColumns.map((col) => (
+            <BoardMarkerCell
+              key={`bottom-${col}`}
+              variant={endCell?.col === col ? 'planet' : 'spacer'}
+              iconSrc={routeAssets.end}
               alt="Exit planet"
             />
-          )}
+          ))}
         </div>
       </div>
     </div>

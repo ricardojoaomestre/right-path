@@ -17,6 +17,8 @@ export interface Cell {
 export interface DifficultyConfig {
   label: string;
   size: number;
+  minTurns: number;
+  maxTurns: number;
   revealTimeMs: number;
   revealStepMs: number;
   tokenRevealTimeMs: number;

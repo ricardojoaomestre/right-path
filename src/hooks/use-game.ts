@@ -157,7 +157,7 @@ export function useGame() {
 
   const startGame = useCallback(() => {
     clearTimer();
-    const path = generatePath(config.size);
+    const path = generatePath(config.size, config.minTurns, config.maxTurns);
 
     setState((prev) => ({
       ...prev,

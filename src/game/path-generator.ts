@@ -8,33 +8,7 @@ function cellsEqual(a: Cell, b: Cell): boolean {
   return a.row === b.row && a.col === b.col;
 }
 
-function neighbors(cell: Cell, size: number): Cell[] {
-  const result: Cell[] = [];
-  const dirs = [
-    { row: -1, col: 0 },
-    { row: 1, col: 0 },
-    { row: 0, col: -1 },
-    { row: 0, col: 1 },
-  ];
-
-  for (const dir of dirs) {
-    const next = { row: cell.row + dir.row, col: cell.col + dir.col };
-    if (
-      next.row >= 0 &&
-      next.row < size &&
-      next.col >= 0 &&
-      next.col < size
-    ) {
-      result.push(next);
-    }
-  }
-
-  return result;
-}
-
-type Direction = { row: number; col: number };
-
-function direction(from: Cell, to: Cell): Direction | null {
+function direction(from: Cell, to: Cell): { row: number; col: number } | null {
   const row = to.row - from.row;
   const col = to.col - from.col;
 
@@ -45,181 +19,246 @@ function direction(from: Cell, to: Cell): Direction | null {
   return { row: Math.sign(row), col: Math.sign(col) };
 }
 
-function isAdjacent(a: Cell, b: Cell): boolean {
-  return Math.abs(a.row - b.row) + Math.abs(a.col - b.col) === 1;
-}
+function countTurns(path: Cell[]): number {
+  if (path.length < 3) {
+    return 0;
+  }
 
-function scoreMove(
-  cell: Cell,
-  current: Cell,
-  previous: Cell | null,
-  path: Cell[],
-  endCol: number,
-  size: number,
-): number {
-  let score = (size - 1 - cell.row) * -2;
-  score += Math.abs(endCol - cell.col);
+  let turns = 0;
 
-  const moveDir = direction(current, cell);
+  for (let i = 2; i < path.length; i += 1) {
+    const prevDir = direction(path[i - 2], path[i - 1]);
+    const moveDir = direction(path[i - 1], path[i]);
 
-  if (previous && moveDir) {
-    const prevDir = direction(previous, current);
-
-    if (prevDir) {
-      if (moveDir.row === -prevDir.row && moveDir.col === -prevDir.col) {
-        score += 60;
-      }
-
-      if (moveDir.row === prevDir.row && moveDir.col === prevDir.col) {
-        score -= 10;
-      }
+    if (
+      prevDir &&
+      moveDir &&
+      (moveDir.row !== prevDir.row || moveDir.col !== prevDir.col)
+    ) {
+      turns += 1;
     }
   }
 
-  for (let i = 0; i < path.length - 1; i += 1) {
-    const pathCell = path[i];
-    if (cellsEqual(pathCell, current)) continue;
-    if (isAdjacent(cell, pathCell)) {
-      score += 20;
-    }
-  }
-
-  score += Math.random() * 2;
-  return score;
+  return turns;
 }
 
-function pickNextCell(
-  current: Cell,
-  previous: Cell | null,
-  path: Cell[],
-  visited: Set<string>,
-  endCol: number,
-  size: number,
-  preferDown: boolean,
-): Cell | null {
-  const candidates = neighbors(current, size)
-    .filter((cell) => !visited.has(cellKey(cell)))
-    .sort(
-      (a, b) => scoreMove(a, current, previous, path, endCol, size) -
-        scoreMove(b, current, previous, path, endCol, size),
-    );
-
-  if (candidates.length === 0) {
+function splitIntoSegments(total: number, parts: number, minPart: number): number[] | null {
+  if (parts <= 0 || total < parts * minPart) {
     return null;
   }
 
-  const poolSize = Math.min(preferDown ? 2 : 3, candidates.length);
-  const pickIndex = Math.floor(Math.random() * poolSize);
-  return candidates[pickIndex];
+  const lengths = Array(parts).fill(minPart);
+  let remaining = total - parts * minPart;
+
+  while (remaining > 0) {
+    const index = Math.floor(Math.random() * parts);
+    lengths[index] += 1;
+    remaining -= 1;
+  }
+
+  return lengths;
 }
 
-function buildPath(size: number): Cell[] | null {
-  const startCol = Math.floor(Math.random() * size);
-  const endCol = Math.floor(Math.random() * size);
+function buildStructuredPath(
+  size: number,
+  startCol: number,
+  endCol: number,
+  targetTurns: number,
+): Cell[] | null {
+  const segmentCount = targetTurns + 1;
+  const verticalSegmentCount = Math.ceil(segmentCount / 2);
+  const horizontalSegmentCount = Math.floor(segmentCount / 2);
+
+  const verticalLengths = splitIntoSegments(size - 1, verticalSegmentCount, 1);
+  if (!verticalLengths) {
+    return null;
+  }
+
+  const horizontalLengths: number[] = [];
+  let colOffset = 0;
+
+  for (let i = 0; i < horizontalSegmentCount; i += 1) {
+    const isLast = i === horizontalSegmentCount - 1;
+    const maxStep = Math.min(3, size - 1);
+
+    if (isLast) {
+      const needed = endCol - (startCol + colOffset);
+      if (Math.abs(needed) > maxStep * (horizontalSegmentCount - i)) {
+        return null;
+      }
+      horizontalLengths.push(needed);
+    } else {
+      let step = 0;
+      let attempts = 0;
+
+      while (step === 0 && attempts < 10) {
+        step = Math.floor(Math.random() * (maxStep * 2 + 1)) - maxStep;
+        attempts += 1;
+      }
+
+      if (step === 0) {
+        step = Math.random() < 0.5 ? -1 : 1;
+      }
+
+      horizontalLengths.push(step);
+    }
+
+    colOffset += horizontalLengths[i];
+  }
+
+  let projectedCol = startCol;
+  for (const step of horizontalLengths) {
+    projectedCol += step;
+    if (projectedCol < 0 || projectedCol >= size) {
+      return null;
+    }
+  }
 
   const path: Cell[] = [{ row: 0, col: startCol }];
   const visited = new Set([cellKey(path[0])]);
-  let current = path[0];
-  let previous: Cell | null = null;
+  let row = 0;
+  let col = startCol;
+  let verticalIndex = 0;
+  let horizontalIndex = 0;
 
-  const maxSteps = size * size * 2;
-  let steps = 0;
+  for (let segment = 0; segment < segmentCount; segment += 1) {
+    const isVertical = segment % 2 === 0;
 
-  while (
-    (current.row !== size - 1 || current.col !== endCol) &&
-    steps < maxSteps
-  ) {
-    const preferDown = current.row < size - 1;
-    const next = pickNextCell(
-      current,
-      previous,
-      path,
-      visited,
-      endCol,
-      size,
-      preferDown,
-    );
+    if (isVertical) {
+      const length = verticalLengths[verticalIndex];
+      verticalIndex += 1;
 
-    if (!next) {
-      break;
+      for (let step = 0; step < length; step += 1) {
+        row += 1;
+        if (row >= size) {
+          return null;
+        }
+
+        const cell = { row, col };
+        const key = cellKey(cell);
+        if (visited.has(key)) {
+          return null;
+        }
+
+        path.push(cell);
+        visited.add(key);
+      }
+    } else {
+      const length = horizontalLengths[horizontalIndex];
+      horizontalIndex += 1;
+      const dir = Math.sign(length);
+
+      for (let step = 0; step < Math.abs(length); step += 1) {
+        col += dir;
+        if (col < 0 || col >= size) {
+          return null;
+        }
+
+        const cell = { row, col };
+        const key = cellKey(cell);
+        if (visited.has(key)) {
+          return null;
+        }
+
+        path.push(cell);
+        visited.add(key);
+      }
     }
-
-    path.push(next);
-    visited.add(cellKey(next));
-    previous = current;
-    current = next;
-    steps += 1;
   }
 
-  let safety = size * size;
-  while ((current.row !== size - 1 || current.col !== endCol) && safety > 0) {
-    safety -= 1;
-
-    const next = pickNextCell(
-      current,
-      previous,
-      path,
-      visited,
-      endCol,
-      size,
-      true,
-    );
-
-    if (!next) {
-      return null;
-    }
-
-    path.push(next);
-    visited.add(cellKey(next));
-    previous = current;
-    current = next;
-  }
-
-  if (current.row !== size - 1 || current.col !== endCol) {
+  if (row !== size - 1 || col !== endCol) {
     return null;
   }
 
   return path;
 }
 
-function pathAdjacencyPenalty(path: Cell[]): number {
-  let penalty = 0;
+function buildSimplePath(size: number, startCol: number, endCol: number): Cell[] {
+  const path: Cell[] = [{ row: 0, col: startCol }];
+  let row = 0;
+  let col = startCol;
 
-  for (let i = 1; i < path.length; i += 1) {
-    const prevDir = i >= 2 ? direction(path[i - 2], path[i - 1]) : null;
-    const moveDir = direction(path[i - 1], path[i]);
+  while (row < size - 1) {
+    row += 1;
+    path.push({ row, col });
+  }
 
-    if (prevDir && moveDir) {
-      if (moveDir.row === -prevDir.row && moveDir.col === -prevDir.col) {
-        penalty += 3;
-      }
-    }
+  while (col !== endCol) {
+    col += Math.sign(endCol - col);
+    path.push({ row, col });
+  }
 
-    for (let j = 0; j < i - 1; j += 1) {
-      if (isAdjacent(path[i], path[j])) {
-        penalty += 1;
-      }
+  return path;
+}
+
+function buildFallbackPath(size: number, minTurns: number): Cell[] {
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    const startCol = Math.floor(Math.random() * size);
+    const endCol = Math.floor(Math.random() * size);
+    const targetTurns = minTurns + Math.floor(Math.random() * 2);
+    const path = buildStructuredPath(size, startCol, endCol, targetTurns);
+
+    if (path && countTurns(path) >= minTurns) {
+      return path;
     }
   }
 
-  return penalty;
+  const startCol = Math.floor(Math.random() * size);
+  const endCol = Math.max(0, Math.min(size - 1, startCol + (Math.random() < 0.5 ? -1 : 1)));
+  const path = buildStructuredPath(size, startCol, endCol, Math.max(minTurns, 1));
+
+  if (path) {
+    return path;
+  }
+
+  return buildSimplePath(size, startCol, endCol);
 }
 
-export function generatePath(size: number): Cell[] {
+function turnCountDistance(
+  turns: number,
+  minTurns: number,
+  maxTurns: number,
+): number {
+  if (turns >= minTurns && turns <= maxTurns) {
+    return 0;
+  }
+
+  if (turns < minTurns) {
+    return minTurns - turns;
+  }
+
+  return turns - maxTurns;
+}
+
+export function generatePath(
+  size: number,
+  minTurns: number,
+  maxTurns: number,
+): Cell[] {
+  const targetTurns =
+    minTurns + Math.floor(Math.random() * (maxTurns - minTurns + 1));
+
   let bestPath: Cell[] | null = null;
-  let bestPenalty = Number.POSITIVE_INFINITY;
+  let bestTurnDistance = Number.POSITIVE_INFINITY;
 
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    const path = buildPath(size);
-    if (!path) continue;
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    const startCol = Math.floor(Math.random() * size);
+    const endCol = Math.floor(Math.random() * size);
+    const path = buildStructuredPath(size, startCol, endCol, targetTurns);
 
-    const penalty = pathAdjacencyPenalty(path);
-    if (penalty < bestPenalty) {
-      bestPenalty = penalty;
+    if (!path) {
+      continue;
+    }
+
+    const turns = countTurns(path);
+    const turnDistance = turnCountDistance(turns, minTurns, maxTurns);
+
+    if (turnDistance < bestTurnDistance) {
+      bestTurnDistance = turnDistance;
       bestPath = path;
     }
 
-    if (penalty === 0) {
+    if (turnDistance === 0) {
       break;
     }
   }
@@ -228,14 +267,7 @@ export function generatePath(size: number): Cell[] {
     return bestPath;
   }
 
-  const fallbackCol = Math.floor(Math.random() * size);
-  const fallback: Cell[] = [{ row: 0, col: fallbackCol }];
-
-  for (let row = 1; row < size; row += 1) {
-    fallback.push({ row, col: fallbackCol });
-  }
-
-  return fallback;
+  return buildFallbackPath(size, minTurns);
 }
 
-export { cellsEqual };
+export { cellsEqual, countTurns };

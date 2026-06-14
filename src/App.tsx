@@ -68,11 +68,8 @@ function App() {
         <main className="screen screen--game">
           <GameHud
             score={game.score}
-            progress={game.progress}
             pathLength={game.path.length}
-            pointsPerTile={game.pointsPerTile}
             tokensRemaining={game.tokensRemaining}
-            tokensUsed={game.tokensUsed}
             phase={game.phase}
             startIcon={routeAssets.start}
             endIcon={routeAssets.end}
@@ -83,6 +80,7 @@ function App() {
             isMemorizing={game.isMemorizing}
             canUseToken={game.canUseToken}
             onUseToken={game.useToken}
+            onExit={game.returnToMenu}
           />
 
           <GameBoard
