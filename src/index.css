@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap");
 
 *,
 *::before,
@@ -21,8 +21,8 @@
   --cyan-glow: rgba(0, 240, 255, 0.5);
   --danger: #ff3366;
   --success: #00ff88;
-  --font-display: 'Orbitron', system-ui, sans-serif;
-  --font-body: 'Rajdhani', system-ui, sans-serif;
+  --font-display: "Orbitron", system-ui, sans-serif;
+  --font-body: "Rajdhani", system-ui, sans-serif;
   --cell-min: 24px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
@@ -51,8 +51,16 @@ body {
   position: relative;
   min-height: 100dvh;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(0, 240, 255, 0.05) 0%, transparent 55%),
-    radial-gradient(ellipse at 50% 100%, rgba(255, 230, 0, 0.03) 0%, transparent 50%),
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(0, 240, 255, 0.05) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at 50% 100%,
+      rgba(255, 230, 0, 0.03) 0%,
+      transparent 50%
+    ),
     var(--bg);
   overflow-x: hidden;
 }
@@ -88,10 +96,7 @@ body {
   position: relative;
   z-index: 1;
   min-height: 100dvh;
-  padding:
-    calc(12px + var(--safe-top))
-    12px
-    calc(12px + var(--safe-bottom));
+  padding: calc(12px + var(--safe-top)) 12px calc(12px + var(--safe-bottom));
   display: flex;
   flex-direction: column;
 }
@@ -113,16 +118,15 @@ body {
 }
 
 .screen--splash::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
-  background:
-    radial-gradient(
-      ellipse at 50% 45%,
-      rgba(0, 0, 0, 0.35) 0%,
-      rgba(0, 0, 0, 0.65) 100%
-    );
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.65) 100%
+  );
   pointer-events: none;
 }
 
@@ -481,8 +485,13 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .hud__route {
@@ -814,7 +823,8 @@ body {
 }
 
 @keyframes wrong-blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     filter: brightness(1.2);
   }
@@ -967,7 +977,7 @@ body {
       32px,
       min(
         56px,
-        calc((100vw - 24px) / var(--grid-cols)),
+        calc((100vw - 50px) / var(--grid-cols)),
         calc((100dvh - 160px) / var(--grid-rows))
       )
     );
